@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTaskContext } from "@/context/TaskContext";
 import { useAuth } from "@/context/AuthContext";
+import { SidebarView } from "@/types";
 import {
   Home,
   CheckSquare,
@@ -23,6 +24,8 @@ export default function Sidebar() {
     tasks,
     selectedCourseId,
     setSelectedCourseId,
+    sidebarView,
+    setSidebarView,
     searchQuery,
     setSearchQuery,
     addCourse,
@@ -38,7 +41,10 @@ export default function Sidebar() {
 
   const taskCount = tasks.length;
   const todoCount = tasks.filter((t) => t.status === "todo").length;
-  const urgentCount = tasks.filter((t) => t.priority === "urgent").length;
+  const inProgressCount = tasks.filter((t) => t.status === "in_progress").length;
+  const urgentCount = tasks.filter(
+    (t) => t.priority === "urgent" || t.priority === "high"
+  ).length;
 
   const courseColors = [
     "#6366f1",
@@ -62,6 +68,15 @@ export default function Sidebar() {
     });
     setNewCourse({ name: "", code: "", instructor: "" });
     setShowAddCourse(false);
+  }
+
+  function handleSidebarClick(view: SidebarView) {
+    setSidebarView(view);
+    setSelectedCourseId(null);
+  }
+
+  function isActive(view: SidebarView) {
+    return sidebarView === view && !selectedCourseId;
   }
 
   return (
@@ -94,9 +109,9 @@ export default function Sidebar() {
             General
           </p>
           <button
-            onClick={() => setSelectedCourseId(null)}
+            onClick={() => handleSidebarClick("home")}
             className={`w-full flex items-center gap-3 px-2 py-2 text-sm rounded-lg transition-colors ${
-              !selectedCourseId
+              isActive("home")
                 ? "bg-indigo-50 text-indigo-700"
                 : "text-gray-600 hover:bg-gray-50"
             }`}
@@ -104,7 +119,14 @@ export default function Sidebar() {
             <Home className="w-4 h-4" />
             <span>Home</span>
           </button>
-          <button className="w-full flex items-center justify-between gap-3 px-2 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+          <button
+            onClick={() => handleSidebarClick("my_tasks")}
+            className={`w-full flex items-center justify-between gap-3 px-2 py-2 text-sm rounded-lg transition-colors ${
+              isActive("my_tasks")
+                ? "bg-indigo-50 text-indigo-700"
+                : "text-gray-600 hover:bg-gray-50"
+            }`}
+          >
             <div className="flex items-center gap-3">
               <CheckSquare className="w-4 h-4" />
               <span>My Tasks</span>
@@ -113,7 +135,14 @@ export default function Sidebar() {
               {taskCount}
             </span>
           </button>
-          <button className="w-full flex items-center justify-between gap-3 px-2 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+          <button
+            onClick={() => handleSidebarClick("upcoming")}
+            className={`w-full flex items-center justify-between gap-3 px-2 py-2 text-sm rounded-lg transition-colors ${
+              isActive("upcoming")
+                ? "bg-indigo-50 text-indigo-700"
+                : "text-gray-600 hover:bg-gray-50"
+            }`}
+          >
             <div className="flex items-center gap-3">
               <Inbox className="w-4 h-4" />
               <span>Upcoming</span>
@@ -122,11 +151,32 @@ export default function Sidebar() {
               {todoCount}
             </span>
           </button>
-          <button className="w-full flex items-center gap-3 px-2 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
-            <BarChart3 className="w-4 h-4" />
-            <span>Progress</span>
+          <button
+            onClick={() => handleSidebarClick("progress")}
+            className={`w-full flex items-center justify-between gap-3 px-2 py-2 text-sm rounded-lg transition-colors ${
+              isActive("progress")
+                ? "bg-indigo-50 text-indigo-700"
+                : "text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <BarChart3 className="w-4 h-4" />
+              <span>Progress</span>
+            </div>
+            {inProgressCount > 0 && (
+              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                {inProgressCount}
+              </span>
+            )}
           </button>
-          <button className="w-full flex items-center justify-between gap-3 px-2 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+          <button
+            onClick={() => handleSidebarClick("goals")}
+            className={`w-full flex items-center justify-between gap-3 px-2 py-2 text-sm rounded-lg transition-colors ${
+              isActive("goals")
+                ? "bg-indigo-50 text-indigo-700"
+                : "text-gray-600 hover:bg-gray-50"
+            }`}
+          >
             <div className="flex items-center gap-3">
               <Target className="w-4 h-4" />
               <span>Goals</span>
@@ -145,7 +195,7 @@ export default function Sidebar() {
               My Courses
             </p>
             <button
-              onClick={() => setShowAddCourse(true)}
+              onClick={() => setShowAddCourse(!showAddCourse)}
               className="text-gray-400 hover:text-indigo-600 transition-colors"
             >
               <Plus className="w-4 h-4" />
@@ -159,11 +209,10 @@ export default function Sidebar() {
             return (
               <button
                 key={course.id}
-                onClick={() =>
-                  setSelectedCourseId(
-                    selectedCourseId === course.id ? null : course.id
-                  )
-                }
+                onClick={() => {
+                  setSelectedCourseId(course.id);
+                  setSidebarView("home");
+                }}
                 className={`w-full flex items-center justify-between gap-3 px-2 py-2 text-sm rounded-lg transition-colors group ${
                   selectedCourseId === course.id
                     ? "bg-indigo-50 text-indigo-700"
@@ -175,9 +224,9 @@ export default function Sidebar() {
                     className="w-4 h-4 shrink-0"
                     style={{ color: course.color }}
                   />
-                  <span className="truncate">{course.name}</span>
+                  <span className="truncate">{course.code}</span>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 shrink-0">
                   <span className="text-xs text-gray-400">
                     {courseTaskCount}
                   </span>
@@ -186,7 +235,7 @@ export default function Sidebar() {
                       e.stopPropagation();
                       deleteCourse(course.id);
                     }}
-                    className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-opacity"
+                    className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -196,7 +245,7 @@ export default function Sidebar() {
           })}
 
           {showAddCourse && (
-            <div className="mt-2 p-3 bg-gray-50 rounded-lg space-y-2">
+            <div className="mt-2 p-2 bg-gray-50 rounded-lg space-y-2">
               <input
                 type="text"
                 placeholder="Course name"
@@ -204,7 +253,8 @@ export default function Sidebar() {
                 onChange={(e) =>
                   setNewCourse({ ...newCourse, name: e.target.value })
                 }
-                className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full px-2 py-1.5 text-xs border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                autoFocus
               />
               <input
                 type="text"
@@ -213,18 +263,18 @@ export default function Sidebar() {
                 onChange={(e) =>
                   setNewCourse({ ...newCourse, code: e.target.value })
                 }
-                className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full px-2 py-1.5 text-xs border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
               />
               <input
                 type="text"
-                placeholder="Instructor"
+                placeholder="Instructor (optional)"
                 value={newCourse.instructor}
                 onChange={(e) =>
                   setNewCourse({ ...newCourse, instructor: e.target.value })
                 }
-                className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full px-2 py-1.5 text-xs border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
               />
-              <div className="flex gap-2">
+              <div className="flex gap-1">
                 <button
                   onClick={handleAddCourse}
                   className="flex-1 px-2 py-1.5 text-xs bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"

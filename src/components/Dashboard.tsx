@@ -5,7 +5,24 @@ import KanbanBoard from "./KanbanBoard";
 import CalendarView from "./CalendarView";
 import ListView from "./ListView";
 import TaskDetailPanel from "./TaskDetailPanel";
-import { LayoutGrid, List, Calendar, GraduationCap } from "lucide-react";
+import {
+  LayoutGrid,
+  List,
+  Calendar,
+  GraduationCap,
+  CheckSquare,
+  Inbox,
+  BarChart3,
+  Target,
+} from "lucide-react";
+
+const sidebarViewConfig = {
+  home: { label: "My Tasks", icon: GraduationCap },
+  my_tasks: { label: "All Tasks", icon: CheckSquare },
+  upcoming: { label: "Upcoming", icon: Inbox },
+  progress: { label: "In Progress", icon: BarChart3 },
+  goals: { label: "Goals & Priorities", icon: Target },
+} as const;
 
 export default function Dashboard() {
   const {
@@ -13,6 +30,7 @@ export default function Dashboard() {
     setViewMode,
     selectedTaskId,
     selectedCourseId,
+    sidebarView,
     courses,
     filteredTasks,
   } = useTaskContext();
@@ -26,6 +44,9 @@ export default function Dashboard() {
     (t) => t.status === "in_progress"
   ).length;
   const doneCount = filteredTasks.filter((t) => t.status === "done").length;
+
+  const viewConfig = sidebarViewConfig[sidebarView];
+  const ViewIcon = viewConfig.icon;
 
   return (
     <div className="flex-1 flex overflow-hidden">
@@ -44,8 +65,8 @@ export default function Dashboard() {
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
-                    <GraduationCap className="w-5 h-5 text-indigo-600" />
-                    My Tasks
+                    <ViewIcon className="w-5 h-5 text-indigo-600" />
+                    {viewConfig.label}
                   </span>
                 )}
               </h1>
@@ -128,8 +149,8 @@ export default function Dashboard() {
 
         <main className="flex-1 overflow-hidden p-6 bg-gray-50">
           {viewMode === "board" && <KanbanBoard />}
-          {viewMode === "calendar" && <CalendarView />}
           {viewMode === "list" && <ListView />}
+          {viewMode === "calendar" && <CalendarView />}
         </main>
       </div>
 
