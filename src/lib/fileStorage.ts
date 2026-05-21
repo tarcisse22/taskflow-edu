@@ -84,7 +84,10 @@ export async function uploadFile(
   return material;
 }
 
-export async function getFileBlob(materialId: string): Promise<Blob | null> {
+export async function getFileBlob(
+  materialId: string,
+  type?: string
+): Promise<Blob | null> {
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(FILES_STORE, "readonly");
@@ -92,7 +95,7 @@ export async function getFileBlob(materialId: string): Promise<Blob | null> {
     const request = store.get(materialId);
     request.onsuccess = () => {
       const data = request.result as ArrayBuffer | undefined;
-      resolve(data ? new Blob([data]) : null);
+      resolve(data ? new Blob([data], type ? { type } : undefined) : null);
     };
     request.onerror = () => reject(request.error);
   });

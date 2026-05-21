@@ -37,9 +37,13 @@ export interface CheatSheet {
 
 export type AIResult = Summary | FlashcardSet | Quiz | CheatSheet;
 
-export async function extractText(file: Blob): Promise<string> {
+export async function extractText(file: Blob, name?: string): Promise<string> {
   const formData = new FormData();
-  formData.append("file", file);
+  if (name) {
+    formData.append("file", file, name);
+  } else {
+    formData.append("file", file);
+  }
 
   const res = await fetch("/api/extract-text", {
     method: "POST",

@@ -111,7 +111,7 @@ export default function MaterialsView() {
   }
 
   async function handleDownload(material: Material) {
-    const blob = await getFileBlob(material.id);
+    const blob = await getFileBlob(material.id, material.type);
     if (!blob) return;
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
