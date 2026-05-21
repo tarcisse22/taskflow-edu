@@ -4,6 +4,7 @@ import { useTaskContext } from "@/context/TaskContext";
 import KanbanBoard from "./KanbanBoard";
 import CalendarView from "./CalendarView";
 import ListView from "./ListView";
+import MaterialsView from "./MaterialsView";
 import TaskDetailPanel from "./TaskDetailPanel";
 import {
   LayoutGrid,
@@ -14,6 +15,7 @@ import {
   Inbox,
   BarChart3,
   Target,
+  FileUp,
 } from "lucide-react";
 
 const sidebarViewConfig = {
@@ -22,6 +24,7 @@ const sidebarViewConfig = {
   upcoming: { label: "Upcoming", icon: Inbox },
   progress: { label: "In Progress", icon: BarChart3 },
   goals: { label: "Goals & Priorities", icon: Target },
+  materials: { label: "Materials", icon: FileUp },
 } as const;
 
 export default function Dashboard() {
@@ -38,6 +41,8 @@ export default function Dashboard() {
   const course = selectedCourseId
     ? courses.find((c) => c.id === selectedCourseId)
     : null;
+
+  const isMaterials = sidebarView === "materials";
 
   const todoCount = filteredTasks.filter((t) => t.status === "todo").length;
   const inProgressCount = filteredTasks.filter(
@@ -77,84 +82,92 @@ export default function Dashboard() {
               )}
             </div>
 
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-4 text-sm">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-gray-300" />
-                  <span className="text-gray-500">
-                    To do:{" "}
-                    <span className="font-semibold text-gray-700">
-                      {todoCount}
+            {!isMaterials && (
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-gray-300" />
+                    <span className="text-gray-500">
+                      To do:{" "}
+                      <span className="font-semibold text-gray-700">
+                        {todoCount}
+                      </span>
                     </span>
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-blue-400" />
-                  <span className="text-gray-500">
-                    In progress:{" "}
-                    <span className="font-semibold text-gray-700">
-                      {inProgressCount}
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-blue-400" />
+                    <span className="text-gray-500">
+                      In progress:{" "}
+                      <span className="font-semibold text-gray-700">
+                        {inProgressCount}
+                      </span>
                     </span>
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-green-400" />
-                  <span className="text-gray-500">
-                    Done:{" "}
-                    <span className="font-semibold text-gray-700">
-                      {doneCount}
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-green-400" />
+                    <span className="text-gray-500">
+                      Done:{" "}
+                      <span className="font-semibold text-gray-700">
+                        {doneCount}
+                      </span>
                     </span>
-                  </span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
-                <button
-                  onClick={() => setViewMode("list")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors ${
-                    viewMode === "list"
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                  List
-                </button>
-                <button
-                  onClick={() => setViewMode("board")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors ${
-                    viewMode === "board"
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                  Board
-                </button>
-                <button
-                  onClick={() => setViewMode("calendar")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors ${
-                    viewMode === "calendar"
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  <Calendar className="w-4 h-4" />
-                  Calendar
-                </button>
+                <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
+                  <button
+                    onClick={() => setViewMode("list")}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors ${
+                      viewMode === "list"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    <List className="w-4 h-4" />
+                    List
+                  </button>
+                  <button
+                    onClick={() => setViewMode("board")}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors ${
+                      viewMode === "board"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                    Board
+                  </button>
+                  <button
+                    onClick={() => setViewMode("calendar")}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors ${
+                      viewMode === "calendar"
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Calendar
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </header>
 
         <main className="flex-1 overflow-hidden p-6 bg-gray-50">
-          {viewMode === "board" && <KanbanBoard />}
-          {viewMode === "list" && <ListView />}
-          {viewMode === "calendar" && <CalendarView />}
+          {isMaterials ? (
+            <MaterialsView />
+          ) : (
+            <>
+              {viewMode === "board" && <KanbanBoard />}
+              {viewMode === "list" && <ListView />}
+              {viewMode === "calendar" && <CalendarView />}
+            </>
+          )}
         </main>
       </div>
 
-      {selectedTaskId && <TaskDetailPanel />}
+      {selectedTaskId && !isMaterials && <TaskDetailPanel />}
     </div>
   );
 }

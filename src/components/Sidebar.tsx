@@ -16,6 +16,7 @@ import {
   GraduationCap,
   X,
   LogOut,
+  FileUp,
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -186,6 +187,17 @@ export default function Sidebar() {
                 {urgentCount}
               </span>
             )}
+          </button>
+          <button
+            onClick={() => handleSidebarClick("materials")}
+            className={`w-full flex items-center gap-3 px-2 py-2 text-sm rounded-lg transition-colors ${
+              isActive("materials")
+                ? "bg-indigo-50 text-indigo-700"
+                : "text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            <FileUp className="w-4 h-4" />
+            <span>Materials</span>
           </button>
         </div>
 
