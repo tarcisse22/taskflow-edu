@@ -39,3 +39,11 @@ export interface Course {
 }
 
 export type ViewMode = "board" | "list" | "calendar";
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  passwordHash: string;
+  createdAt: string;
+}
