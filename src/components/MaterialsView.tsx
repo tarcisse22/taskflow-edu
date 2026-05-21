@@ -20,7 +20,9 @@ import {
   Trash2,
   Download,
   FolderOpen,
+  Sparkles,
 } from "lucide-react";
+import StudyTools from "./StudyTools";
 
 const ACCEPTED_TYPES = [
   "application/pdf",
@@ -53,6 +55,7 @@ export default function MaterialsView() {
     courses[0]?.id ?? ""
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [studyMaterial, setStudyMaterial] = useState<Material | null>(null);
 
   const userId = user?.id ?? "";
 
@@ -127,6 +130,17 @@ export default function MaterialsView() {
   const sorted = [...filtered].sort(
     (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
   );
+
+  if (studyMaterial) {
+    return (
+      <div className="h-full overflow-y-auto">
+        <StudyTools
+          material={studyMaterial}
+          onClose={() => setStudyMaterial(null)}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="h-full overflow-y-auto">
@@ -262,6 +276,13 @@ export default function MaterialsView() {
                   </div>
                 </div>
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => setStudyMaterial(material)}
+                    title="AI Study Tools"
+                    className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                  </button>
                   <button
                     onClick={() => handleDownload(material)}
                     title="Download"
