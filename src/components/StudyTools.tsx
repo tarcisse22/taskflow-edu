@@ -47,9 +47,9 @@ export default function StudyTools({ material, onClose }: StudyToolsProps) {
 
   async function getText(): Promise<string> {
     if (extractedText) return extractedText;
-    const blob = await getFileBlob(material.id);
+    const blob = await getFileBlob(material.id, material.type);
     if (!blob) throw new Error("File not found");
-    const text = await extractText(blob);
+    const text = await extractText(blob, material.name);
     setExtractedText(text);
     return text;
   }
