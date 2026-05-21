@@ -8,7 +8,7 @@ import {
   useCallback,
   ReactNode,
 } from "react";
-import { Task, Course, ViewMode } from "@/types";
+import { Task, Course, ViewMode, SidebarView } from "@/types";
 
 interface TaskContextType {
   tasks: Task[];
@@ -16,12 +16,14 @@ interface TaskContextType {
   selectedCourseId: string | null;
   selectedTaskId: string | null;
   viewMode: ViewMode;
+  sidebarView: SidebarView;
   searchQuery: string;
   setTasks: (tasks: Task[]) => void;
   setCourses: (courses: Course[]) => void;
   setSelectedCourseId: (id: string | null) => void;
   setSelectedTaskId: (id: string | null) => void;
   setViewMode: (mode: ViewMode) => void;
+  setSidebarView: (view: SidebarView) => void;
   setSearchQuery: (query: string) => void;
   addTask: (task: Task) => void;
   updateTask: (task: Task) => void;
@@ -62,6 +64,7 @@ export function TaskProvider({ children, userId }: TaskProviderProps) {
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("board");
+  const [sidebarView, setSidebarView] = useState<SidebarView>("home");
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -107,7 +110,19 @@ export function TaskProvider({ children, userId }: TaskProviderProps) {
       !searchQuery ||
       task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCourse && matchesSearch;
+
+    if (!matchesCourse || !matchesSearch) return false;
+
+    switch (sidebarView) {
+      case "upcoming":
+        return task.status === "todo";
+      case "progress":
+        return task.status === "in_progress";
+      case "goals":
+        return task.priority === "urgent" || task.priority === "high";
+      default:
+        return true;
+    }
   });
 
   return (
@@ -118,12 +133,14 @@ export function TaskProvider({ children, userId }: TaskProviderProps) {
         selectedCourseId,
         selectedTaskId,
         viewMode,
+        sidebarView,
         searchQuery,
         setTasks,
         setCourses,
         setSelectedCourseId,
         setSelectedTaskId,
         setViewMode,
+        setSidebarView,
         setSearchQuery,
         addTask,
         updateTask,

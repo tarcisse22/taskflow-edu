@@ -16,7 +16,8 @@ export default function KanbanBoard() {
   const { filteredTasks, addTask, updateTask, courses } = useTaskContext();
   const [addingToColumn, setAddingToColumn] = useState<TaskStatus | null>(null);
   const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [newTaskCourse, setNewTaskCourse] = useState("");
+  const [newTaskCourse, setNewTaskCourse] = useState(courses[0]?.id ?? "");
+  const [titleError, setTitleError] = useState(false);
   const [newTaskCategory, setNewTaskCategory] =
     useState<TaskCategory>("assignment");
   const [newTaskPriority, setNewTaskPriority] = useState<Priority>("medium");
@@ -24,7 +25,11 @@ export default function KanbanBoard() {
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
 
   function handleAddTask(status: TaskStatus) {
-    if (!newTaskTitle.trim()) return;
+    if (!newTaskTitle.trim()) {
+      setTitleError(true);
+      return;
+    }
+    setTitleError(false);
     const task: Task = {
       id: `task-${crypto.randomUUID()}`,
       title: newTaskTitle,
@@ -42,7 +47,7 @@ export default function KanbanBoard() {
     };
     addTask(task);
     setNewTaskTitle("");
-    setNewTaskCourse("");
+    setNewTaskCourse(courses[0]?.id ?? "");
     setNewTaskCategory("assignment");
     setNewTaskPriority("medium");
     setNewTaskDueDate("");
@@ -107,20 +112,29 @@ export default function KanbanBoard() {
                     type="text"
                     placeholder="Task title..."
                     value={newTaskTitle}
-                    onChange={(e) => setNewTaskTitle(e.target.value)}
+                    onChange={(e) => {
+                      setNewTaskTitle(e.target.value);
+                      if (e.target.value.trim()) setTitleError(false);
+                    }}
                     onKeyDown={(e) =>
                       e.key === "Enter" && handleAddTask(column.id)
                     }
-                    className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className={`w-full px-2 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 ${
+                      titleError
+                        ? "border-red-400 bg-red-50"
+                        : "border-gray-200"
+                    }`}
                     autoFocus
                   />
+                  {titleError && (
+                    <p className="text-xs text-red-500">Please enter a task title</p>
+                  )}
                   <div className="grid grid-cols-2 gap-2">
                     <select
                       value={newTaskCourse}
                       onChange={(e) => setNewTaskCourse(e.target.value)}
                       className="px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
                     >
-                      <option value="">Course...</option>
                       {courses.map((c) => (
                         <option key={c.id} value={c.id}>
                           {c.code}
