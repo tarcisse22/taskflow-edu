@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import "pdf-parse/worker";
 import { PDFParse } from "pdf-parse";
 
 export async function POST(request: NextRequest) {
