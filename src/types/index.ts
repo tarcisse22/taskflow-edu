@@ -40,7 +40,16 @@ export interface Course {
 
 export type ViewMode = "board" | "list" | "calendar";
 
-export type SidebarView = "home" | "my_tasks" | "upcoming" | "progress" | "goals";
+export type SidebarView = "home" | "my_tasks" | "upcoming" | "progress" | "goals" | "materials";
+
+export interface Material {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  courseId: string;
+  uploadedAt: string;
+}
 
 export interface User {
   id: string;
