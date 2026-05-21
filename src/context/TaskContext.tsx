@@ -9,7 +9,6 @@ import {
   ReactNode,
 } from "react";
 import { Task, Course, ViewMode } from "@/types";
-import { sampleTasks, sampleCourses } from "@/data/sampleData";
 
 interface TaskContextType {
   tasks: Task[];
@@ -45,12 +44,20 @@ function loadFromStorage<T>(key: string, fallback: T): T {
   }
 }
 
-export function TaskProvider({ children }: { children: ReactNode }) {
+interface TaskProviderProps {
+  children: ReactNode;
+  userId: string;
+}
+
+export function TaskProvider({ children, userId }: TaskProviderProps) {
+  const tasksKey = `taskflow-tasks-${userId}`;
+  const coursesKey = `taskflow-courses-${userId}`;
+
   const [tasks, setTasks] = useState<Task[]>(() =>
-    loadFromStorage("taskflow-tasks", sampleTasks)
+    loadFromStorage(tasksKey, [])
   );
   const [courses, setCourses] = useState<Course[]>(() =>
-    loadFromStorage("taskflow-courses", sampleCourses)
+    loadFromStorage(coursesKey, [])
   );
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
@@ -58,12 +65,12 @@ export function TaskProvider({ children }: { children: ReactNode }) {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    localStorage.setItem("taskflow-tasks", JSON.stringify(tasks));
-  }, [tasks]);
+    localStorage.setItem(tasksKey, JSON.stringify(tasks));
+  }, [tasks, tasksKey]);
 
   useEffect(() => {
-    localStorage.setItem("taskflow-courses", JSON.stringify(courses));
-  }, [courses]);
+    localStorage.setItem(coursesKey, JSON.stringify(courses));
+  }, [courses, coursesKey]);
 
   const addTask = useCallback((task: Task) => {
     setTasks((prev) => [...prev, task]);

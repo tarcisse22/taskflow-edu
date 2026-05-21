@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTaskContext } from "@/context/TaskContext";
+import { useAuth } from "@/context/AuthContext";
 import {
   Home,
   CheckSquare,
@@ -13,6 +14,7 @@ import {
   Search,
   GraduationCap,
   X,
+  LogOut,
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -26,6 +28,7 @@ export default function Sidebar() {
     addCourse,
     deleteCourse,
   } = useTaskContext();
+  const { user, logout } = useAuth();
   const [showAddCourse, setShowAddCourse] = useState(false);
   const [newCourse, setNewCourse] = useState({
     name: "",
@@ -242,17 +245,26 @@ export default function Sidebar() {
 
       <div className="p-3 border-t border-gray-200">
         <div className="flex items-center gap-3 px-2 py-2">
-          <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-            <span className="text-sm font-semibold text-indigo-600">S</span>
+          <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center shrink-0">
+            <span className="text-sm font-semibold text-indigo-600">
+              {user?.name?.charAt(0).toUpperCase() || "U"}
+            </span>
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-sm font-medium text-gray-900 truncate">
-              Student
+              {user?.name || "User"}
             </p>
             <p className="text-xs text-gray-500 truncate">
-              student@university.edu
+              {user?.email || ""}
             </p>
           </div>
+          <button
+            onClick={logout}
+            title="Sign out"
+            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors shrink-0"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </aside>
